@@ -1,0 +1,179 @@
+package com.example.movieinventoryservice.entity;
+import java.sql.Date;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+
+import io.swagger.annotations.ApiModelProperty;
+
+@Entity
+public class Movie {
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private int id;
+	
+	@ApiModelProperty(notes="Name of the Movie", example="Asuran,")
+	private String name;
+	
+	@ApiModelProperty(notes="List of Cast id's")
+	@ManyToMany
+	private List<Cast> cast;
+	
+	@ApiModelProperty(notes="duration of the movie in minutes", example="120,150,..")
+	private int duration;
+	
+	@ManyToMany
+	private List<Genre> genre;
+	
+	private String synopsis;
+	
+	private String facts;
+	@Lob
+	private byte[] trailer;
+	
+	@ApiModelProperty(notes="name of the language", example="English,Turkish,Mandarin,...")
+	private String language;
+	
+	@ApiModelProperty(notes="Date of Release", example="yyyy-mm-dd")
+	private Date releaseDate;
+	
+	@Lob
+	private byte[] picture;
+	
+	private int frequentView;
+	
+	public Movie() {
+		super();
+	}
+
+	public Movie(int id, String name, List<Cast> cast, int duration, List<Genre> genre, String synopsis, String facts,
+			byte[] trailer, String language, Date releaseDate, byte[] picture, int frequentView) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.cast = cast;
+		this.duration = duration;
+		this.genre = genre;
+		this.synopsis = synopsis;
+		this.facts = facts;
+		this.trailer = trailer;
+		this.language = language;
+		this.releaseDate = releaseDate;
+		this.picture = picture;
+		this.frequentView = frequentView;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<Cast> getCast() {
+		return cast;
+	}
+
+	public void setCast(List<Cast> cast) {
+		this.cast = cast;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+
+	public List<Genre> getGenre() {
+		return genre;
+	}
+
+	public void setGenre(List<Genre> genre) {
+		this.genre = genre;
+	}
+
+	public String getSynopsis() {
+		return synopsis;
+	}
+
+	public void setSynopsis(String synopsis) {
+		this.synopsis = synopsis;
+	}
+
+	public String getFacts() {
+		return facts;
+	}
+
+	public void setFacts(String facts) {
+		this.facts = facts;
+	}
+
+	public byte[] getTrailer() {
+		return trailer;
+	}
+
+	public void setTrailer(byte[] trailer) {
+		this.trailer = trailer;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public Date getReleaseDate() {
+		return releaseDate;
+	}
+
+	public void setReleaseDate(Date releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public byte[] getPicture() {
+		return picture;
+	}
+
+	public void setPicture(byte[] picture) {
+		this.picture = picture;
+	}
+
+	public int getFrequentView() {
+		return frequentView;
+	}
+
+	public void setFrequentView(int frequentView) {
+		this.frequentView = frequentView;
+	}
+
+	@Override
+	public String toString() {
+		return "Movie [id=" + id + ", name=" + name + ", cast=" + cast + ", duration=" + duration + ", genre=" + genre
+				+ ", synopsis=" + synopsis + ", facts=" + facts + ", trailer=" + Arrays.toString(trailer)
+				+ ", language=" + language + ", releaseDate=" + releaseDate + ", picture=" + Arrays.toString(picture)
+				+ ", frequentView=" + frequentView + "]";
+	}
+	
+	
+	
+
+}
