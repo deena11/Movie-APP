@@ -1,0 +1,69 @@
+app:
+    client:
+        id: client
+        secret: password
+eureka:
+    client:
+        fetch-registry: true
+        register-with-eureka: true
+        serviceUrl:
+            defaultZone: http://eureka:8761/eureka/
+logging:
+    level:
+        com:
+            example:
+                movie-inventory-service: =DEBUG
+        io:
+            swagger:
+                models:
+                    parameters:
+                        AbstractSerializableParameter: ERROR
+        org:
+            hibernate:
+                SQL: DEBUG
+                type:
+                    descriptor:
+                        sql:
+                            BasicBinder: TRACE
+        root: info
+    pattern:
+        console: '%d{dd-MM-yyyy HH:mm:ss.SSS} %logger.%M - %msg%n'
+security:
+    oauth2:
+        client:
+            client-id: client
+            client-secret: password
+        resource:
+            token-info-uri: http://localhost:8091/oauth/check_token
+server:
+    port: 8091
+spring:
+    application:
+        name: user-service
+    datasource:
+        password: root123
+        tomcat:
+            max-active: 50
+            max-idle: 20
+            max-wait: 20000
+            min-idle: 15
+        url: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true&serverTimezone=UTC
+        username: root
+    jackson:
+        serialization:
+            fail-on-empty-beans: false
+    jpa:
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL8Dialect
+                format_sql: true
+                hbm2ddl:
+                    auto: update
+                id:
+                    new_generator_mappings: false
+    security:
+        user:
+            name: DeenaBandhu
+            password: m1053559
+token:
+    url: http://localhost:8091//oauth/token

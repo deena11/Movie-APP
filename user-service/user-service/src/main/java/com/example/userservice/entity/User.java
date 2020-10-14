@@ -24,7 +24,6 @@ public class User implements Serializable {
 	private String username;
 
 	@Column(name = "password")
-	@Pattern(regexp="((?=.*[@!#$%])(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,22})")
 	private String password;
 
 	@Column(name = "email")

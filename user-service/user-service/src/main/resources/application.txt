@@ -4,10 +4,14 @@ spring.security.user.name=DeenaBandhu
 spring.security.user.password=m1053559
 
 
-spring.datasource.url=jdbc:mysql://localhost:3306/movie_app?useSSL=true&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://mysql-container:3306/movieapp?useSSL=true&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=root
+spring.datasource.password=root123
 
+
+eureka.client.service-url.defaultzone=http://eureka-server:8761/eureka/
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
 
 
 spring.datasource.tomcat.max-wait=20000

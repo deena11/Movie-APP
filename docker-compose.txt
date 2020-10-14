@@ -1,0 +1,96 @@
+version: "3.8"
+services:
+  eureka-server:
+    container_name: eureka-server
+    ports:
+      - '8761:8761'
+    build: ./discovery-server/discovery-server
+    networks:
+      - backendNetwork
+
+  user-service:
+     container_name: user-service
+     build: ./user-service/user-service
+     image: user-service
+     ports:
+       - "8091:8091"
+     depends_on:
+       - eureka-server
+       - mysql-container
+     environment: 
+       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
+       SPRING_DATASOURCE_USERNAME: root
+       SPRING_DATASOURCE_PASSWORD: root
+       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+       AUTH_LINK: http://user-service:8091/oauth/token
+       #SPRING_APPLICATION_JSON: '{"spring": {"cloud": {"config": {"uri": "http://eureka-server:8761"}}}}'
+     networks: 
+       - backendNetwork
+
+  inventory-service:
+     container_name: inventory-service
+     build: ./movie-inventory-service/movie-inventory-service
+     image: inventory-service
+     ports:
+       - "8092:8092"
+     depends_on:
+       - eureka-server
+       - mysql-container
+       - user-service
+     environment: 
+       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
+       SPRING_DATASOURCE_USERNAME: root
+       SPRING_DATASOURCE_PASSWORD: root
+       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+       AUTH_LINK: http://user-service:8081/oauth/token
+       #SPRING_APPLICATION_JSON: '{"spring": {"cloud": {"config": {"uri": "http://eureka-server:8761"}}}}'
+     networks: 
+       - backendNetwork
+
+  mysql-container:
+    container_name: mysql-container
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: movieapp
+    ports:
+      - "3307:3306"
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - backendNetwork
+
+  
+  #userserver:
+   # container_name: user-service
+   # ports:
+    #  - '8091:8091'
+    #build:
+    #  context: ./user-service/user-service
+     # dockerfile: DockerFile
+    #restart: always
+    #environment:
+     # SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container/movieapp?useSSL=false
+     # SPRING_DATASOURCE_USERNAME: root
+     # SPRING_DATASOURCE_PASSWORD: root123
+    #networks:
+     # - backendNetwork
+  #inventoryserver:
+   # container_name: inventory-service
+   # ports:
+    #  - '8082:8082'
+    #depends_on:
+     # - mysql-container
+    #build:
+    #  context: ./movie-inventory-service/movie-inventory-service
+     # dockerfile: DockerFile
+    #networks:
+     # - backendNetwork
+
+volumes:
+  db_data:
+    driver: local     
+networks:
+    backendNetwork:
+        driver: bridge 
