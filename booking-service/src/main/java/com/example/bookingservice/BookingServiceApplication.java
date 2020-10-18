@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableEurekaClient
+@EnableHystrix
 public class BookingServiceApplication {
 	
 	@Bean
