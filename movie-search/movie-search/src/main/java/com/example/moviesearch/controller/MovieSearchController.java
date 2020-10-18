@@ -23,6 +23,7 @@ import com.example.moviesearch.repository.PlayDataRepository;
 import com.example.moviesearch.restApiConfig.ApiSuccessResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 
 
 @RestController
@@ -31,9 +32,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class MovieSearchController {
 	
 	private Logger logger = LoggerFactory.getLogger(MovieSearchController.class);
+
+	@Value("${play.url}")
+	String playUrl;
 	
 	@Autowired
-    private SearchBuilder searchBuilder;
+    	private SearchBuilder searchBuilder;
 
 
 	@Autowired
@@ -62,7 +66,7 @@ public class MovieSearchController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
-    @KafkaListener(topics = "PlayTopic", groupId="msg")
+    @KafkaListener(topics = "${kafka.topic.name}", groupId = "${kafka.consumer.group.id")
     public void consume(String message) {
      logger.info("Consumed message: " + message);
      operations.putMapping(PlayData.class);
@@ -71,7 +75,7 @@ public class MovieSearchController {
 		logger.info("Entered into Loading Data services");
 
 		ApiSuccessResponse response = restTemplate
-				.exchange("http://movie-inventory-service/play/all", HttpMethod.GET, null, ApiSuccessResponse.class)
+				.exchange(playUrl, HttpMethod.GET, null, ApiSuccessResponse.class)
 				.getBody();
 
 		logger.info(response.getBody().toString());

@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.example.moviesearch.model.PlayData;
 import com.example.moviesearch.repository.PlayDataRepository;
@@ -23,6 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class LoadData {
 
 	private Logger logger = LoggerFactory.getLogger(LoadData.class);
+
+	@Value("${play.url}")
+	String playUrl;
+
 
 	@Autowired
 	private ElasticsearchOperations operations;
@@ -46,7 +51,7 @@ public class LoadData {
 		logger.info("Entered into Loading Data services");
 
 		ApiSuccessResponse response = restTemplate
-				.exchange("http://localhost:8081/play/all", HttpMethod.GET, null, ApiSuccessResponse.class)
+				.exchange(playUrl, HttpMethod.GET, null, ApiSuccessResponse.class)
 				.getBody();
 
 		logger.info(response.getBody().toString());

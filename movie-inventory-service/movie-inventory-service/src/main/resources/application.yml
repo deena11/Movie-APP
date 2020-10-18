@@ -44,3 +44,7 @@ app:
     description: This project contains API end points for the Movie inventory services.
 kafka:
   url: http://kafka-service/kafka/publish/
+logging.file: inventory-service.log
+logstash:
+  host: localhost
+  port: 5044

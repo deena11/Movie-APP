@@ -34,3 +34,6 @@ token:
 auth:
   server:
      schema: http
+logstash:
+  host: localhost
+  port: 5044

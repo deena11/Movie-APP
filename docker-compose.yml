@@ -10,18 +10,18 @@ services:
     networks: 
       - main-network
     
-  api-gateway:
-    container_name: api-gateway
-    build: ./api-gateway/api-gateway
-    image: api-gateway
-    ports:
-      - "8070:8070"
-    depends_on:
-      - eureka
-    environment: 
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
-    networks:
-      - main-network
+  # api-gateway:
+  #   container_name: api-gateway
+  #   build: ./api-gateway/api-gateway
+  #   image: api-gateway
+  #   ports:
+  #     - "8070:8070"
+  #   depends_on:
+  #     - eureka
+  #   environment: 
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+  #   networks:
+  #     - main-network
 
   user-service:
     container_name: user-service
@@ -32,12 +32,15 @@ services:
     depends_on:
       - eureka
       - mysql-container
+      - logstash
     environment: 
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
       TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
+      LOGSTASH_HOST: http://kgzok12814dns.eastus2.cloudapp.azure.com:9600
+      LOGSTASH_PORT: 9600
     networks: 
       - main-network
       
@@ -49,7 +52,8 @@ services:
       - "8081:8081"
     depends_on:
       - eureka
-      - mysql-container     
+      - mysql-container 
+      - logstash    
     environment: 
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
       SPRING_DATASOURCE_USERNAME: root
@@ -57,46 +61,60 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
       TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
       SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI:  http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/check_token
+      LOGSTASH_HOST: http://kgzok12814dns.eastus2.cloudapp.azure.com:9600
+      LOGSTASH_PORT: 9600
     networks: 
       - main-network                      
     
-  movie-booking-service:
-    container_name: movie-booking-service
-    build: ./booking-service
-    image: movie-booking-service
-    ports:
-      - "8085:8085"
-    depends_on:
-      - eureka
-      - mysql-container
-      - kafka     
-    environment: 
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
-      KAFKA_BOOTSTRAPADDRESS: kafka:9092
-      TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
-      SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI:  http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/check_token
-    networks: 
-      - main-network    
+  # movie-booking-service:
+  #   container_name: movie-booking-service
+  #   build: ./booking-service
+  #   image: movie-booking-service
+  #   ports:
+  #     - "8085:8085"
+  #   depends_on:
+  #     - eureka
+  #     - mysql-container
+  #     - kafka   
+ #      - logstash
+  #   environment: 
+  #     SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
+  #     SPRING_DATASOURCE_USERNAME: root
+  #     SPRING_DATASOURCE_PASSWORD: root
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+  #     KAFKA_BOOTSTRAPADDRESS: kafka:9092
+  #     TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
+  #     SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI:  http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/check_token
+  #   networks: 
+  #     - main-network    
 
   movie-search:
     container_name: movie-search
     build: ./movie-search/movie-search
     image: movie-search
     ports:
-      - "8084:8084"
+      - "8060:8060"
     depends_on: 
       - eureka
       - elasticsearch
+      - logstash
     environment: 
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/movieapp?useSSL=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      KAFKA_BOOTSTRAPADDRESS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
-      AUTH_LINK: http://user-service:8091/oauth/token
-      PLAY_URL: http://inventory-service:8081/play
-      SPRING_DATA_ELASTICSEARCH_CLUSTERNODES: elasticsearch:9300
+      TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
+      PLAY_URL: http://movie-inventory-service:8081/play/all
+      SPRING_DATA_ELASTICSEARCH_CLUSTER-NODES: elasticsearch:9300
+      SPRING_DATA_ELASTICSEARCH_CLUSTER-NAME: elasticsearch
+      SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI:  http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/check_token
+      LOGSTASH_HOST: http://logstash:9600
+      LOGSTASH_PORT: 9600
+    restart: always
     networks:
-      - main-network
+      main-network:
+      elk:
       
 
   kafka-service:
@@ -108,9 +126,12 @@ services:
     depends_on: 
       - eureka
       - kafka
+      - logstash
     environment: 
       KAFKA_BOOTSTRAPADDRESS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      LOGSTASH_HOST: http://logstash:9600
+      LOGSTASH_PORT: 9600
     networks: 
       - main-network    
 
@@ -155,43 +176,48 @@ services:
       - main-network 
   
   elasticsearch:
-        image: elasticsearch:7.7.0
-        container_name: elasticsearch
-        hostname: elasticsearch
-        environment:
-            - "discovery.type=single-node"
-        ports:
-            - 9200:9200
-            - 9300:9300
-        networks:
-            - main-network
-  kibana:
-        image: kibana:7.7.0
-        container_name: kibana
-        hostname: kibana
-        ports:
-            - 5601:5601
-        links:
-            - elasticsearch:elasticsearch
-        depends_on:
-          - elasticsearch
-        networks:
-          - main-network
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.1
+    container_name: elasticsearch
+    environment:
+      http.host: "0.0.0.0"
+      transport.host: "0.0.0.0"
+      cluster.name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: unless-stopped
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data:rw
+    networks:
+      elk: null
+
   logstash:
-        image: logstash:7.7.0
-        container_name: logstash
-        hostname: logstash
-        ports:
-            - 9600:9600
-            - 8089:8089
-        volumes:
-          - .\logstash:/usr/share/logstash/pipeline/
-        links:
-            - elasticsearch:elasticsearch
-        depends_on:
-          - elasticsearch
-        networks:
-          - main-network
+    image: docker.elastic.co/logstash/logstash-oss:6.2.1
+    container_name: logstash
+    command: logstash -f /logstash/pipeline/logstash.conf
+    ports:
+      - "9600:9600"
+    restart: unless-stopped
+    volumes:
+      - ./etc/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      elk: null
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.2.1
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    restart: unless-stopped      
+    depends_on:
+      - elasticsearch
+    networks:
+      elk: null
+    
 
 volumes:
   db_data:
@@ -200,7 +226,10 @@ volumes:
     driver: local
   kafka_data:
     driver: local
+  elasticsearch:
+      driver: local
 
 networks:
-    main-network:
-        driver: bridge  
+  main-network:
+    driver: bridge
+  elk:
