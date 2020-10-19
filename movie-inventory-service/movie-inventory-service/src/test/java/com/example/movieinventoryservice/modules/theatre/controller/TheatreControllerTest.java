@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.example.movieinventoryservice.entity.Theatre;
+import com.example.movieinventoryservice.modules.theatre.repository.AddressRepository;
+import com.example.movieinventoryservice.modules.theatre.repository.LocationRepository;
 import com.example.movieinventoryservice.modules.theatre.repository.TheatreRepository;
 import com.example.movieinventoryservice.modules.theatre.service.TheatreService;
 import com.example.movieinventoryservice.modules.theatre.service.serviceImpl.TheatreServiceImpl;
@@ -49,6 +51,12 @@ public class TheatreControllerTest {
 
 	@MockBean
 	private TheatreRepository theatreRepository;
+	
+	@MockBean
+	private AddressRepository addressRepository;
+	
+	@MockBean
+	private LocationRepository locationRepository;
 
 	@Before
 	public void setUp() throws Exception {
