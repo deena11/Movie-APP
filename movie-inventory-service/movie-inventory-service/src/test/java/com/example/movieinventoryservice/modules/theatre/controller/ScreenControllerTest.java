@@ -28,15 +28,22 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.example.movieinventoryservice.entity.Screen;
+import com.example.movieinventoryservice.entity.Theatre;
+import com.example.movieinventoryservice.modules.movies.service.MovieService;
+import com.example.movieinventoryservice.modules.theatre.repository.AddressRepository;
+import com.example.movieinventoryservice.modules.theatre.repository.LocationRepository;
 import com.example.movieinventoryservice.modules.theatre.repository.ScreenRepository;
+import com.example.movieinventoryservice.modules.theatre.repository.TheatreRepository;
 import com.example.movieinventoryservice.modules.theatre.service.ScreenService;
+import com.example.movieinventoryservice.modules.theatre.service.TheatreService;
 import com.example.movieinventoryservice.modules.theatre.service.serviceImpl.ScreenServiceImpl;
+import com.example.movieinventoryservice.modules.theatre.service.serviceImpl.TheatreServiceImpl;
 import com.example.movieinventoryservice.restApiConfig.ApiSuccessResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({ ScreenController.class, ScreenServiceImpl.class })
+@WebMvcTest({ ScreenController.class, ScreenServiceImpl.class , TheatreServiceImpl.class})
 @AutoConfigureMockMvc(secure=false)
 public class ScreenControllerTest {
 
@@ -47,9 +54,22 @@ public class ScreenControllerTest {
 
 	@Autowired
 	private ScreenService screenService;
+	
 
 	@MockBean
 	private ScreenRepository screenRepository;
+	
+	@Autowired
+	private TheatreService theatreService;
+	
+	@MockBean
+	private AddressRepository addressRepository;
+	
+	@MockBean
+	private LocationRepository locationRepository;
+	
+	@MockBean
+	private TheatreRepository theatreRepository;
 
 	@Before
 	public void setUp() throws Exception {
@@ -60,6 +80,7 @@ public class ScreenControllerTest {
 		Mockito.when(screenRepository.getOne(Mockito.anyInt())).thenReturn(getScreen());
 		Mockito.when(screenRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(getScreen()));
 		Mockito.when(screenRepository.findAll()).thenReturn(screen);
+		Mockito.when(theatreRepository.findById(Mockito.anyInt())).thenReturn(Optional.of(getTheatre()));
 
 	}
 
@@ -178,7 +199,15 @@ public class ScreenControllerTest {
 		Screen screen = new Screen();
 
 		screen.setName("sampleText");
+		screen.setTheatre(getTheatre());
 		return screen;
 	}
 
+	public Theatre getTheatre() {
+		Theatre theatre = new Theatre();
+		theatre.setId(1);
+		theatre.setName("test");
+		
+		return theatre;
+	}
 }
