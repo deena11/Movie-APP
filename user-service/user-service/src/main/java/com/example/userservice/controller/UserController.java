@@ -42,10 +42,10 @@ public class UserController {
 
 	@DeleteMapping("/logout")
 	public ResponseEntity<?> revokeToken(HttpServletRequest request) throws AccessTokenRevokeException {
-
+		logger.info("Log out Request is Called");
 		ApiSuccessResponse response = new ApiSuccessResponse();
 		response.setError(false);
-		response.setMessage("Loggig out process");
+		response.setMessage("Logging out process");
 		response.setSuccess(true);
 		response.setHttpStatus(HttpStatus.OK.toString());
 		response.setBody(userServiceImpl.logout(request));
@@ -57,7 +57,7 @@ public class UserController {
 	@GetMapping("/{userId}")
 	@PreAuthorize("hasRole('ROLE_user') or hasRole('ROLE_admin')")
 	public ResponseEntity<?> getUser(@PathVariable("userId") int userId) throws RecordNotFoundException {
-
+                logger.info("fetching user details of id - "+userId);
 		ApiSuccessResponse response = new ApiSuccessResponse();
 		response.setError(false);
 		response.setMessage("Successfully fetched Data");
@@ -71,7 +71,7 @@ public class UserController {
 	@GetMapping("/")
 	@PreAuthorize("hasRole('ROLE_admin')")
 	public ResponseEntity<?> getAllUser() throws EmptyListException, RecordNotFoundException {
-
+		logger.info("fetching all user details");
 		ApiSuccessResponse response = new ApiSuccessResponse();
 		response.setError(false);
 		response.setMessage("Successfully fetched Data");
@@ -84,8 +84,8 @@ public class UserController {
 
 	@PostMapping("/add")
 	public ResponseEntity<?> addUser(@RequestBody User user) throws RecordNotAddedException {
-
-		logger.info(user.toString());
+			
+		logger.info("Adding user Details "+user.toString());
 		ApiSuccessResponse response = new ApiSuccessResponse();
 		response.setError(false);
 		response.setMessage("Successfully Added Data");
@@ -99,7 +99,7 @@ public class UserController {
 	@PutMapping("/")
 	@PreAuthorize("hasRole('ROLE_user') or hasRole('ROLE_admin')")
 	public ResponseEntity<?> updateUser(@RequestBody User user) throws RecordNotUpdatedException {
-
+		logger.info("updating user Details for user id -"+user.getId());
 		ApiSuccessResponse response = new ApiSuccessResponse();
 		response.setError(false);
 		response.setMessage("Successfully Updated Data");
@@ -113,7 +113,7 @@ public class UserController {
 	@DeleteMapping("/{userId}")
 	@PreAuthorize("hasRole('ROLE_admin')")
 	public ResponseEntity<?> deleteUser(@PathVariable("userId") int userId) throws RecordNotDeletedException {
-
+		logger.info("Deleting user of id -"+userId);
 		ApiSuccessResponse response = new ApiSuccessResponse();
 		response.setError(false);
 		response.setMessage("Successfully Deleted Data");
