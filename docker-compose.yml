@@ -39,10 +39,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
       TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
-      LOGSTASH_HOST: http://kgzok12814dns.eastus2.cloudapp.azure.com:9600
-      LOGSTASH_PORT: 9600
+      LOGSTASH_HOST: logstash
+      LOGSTASH_PORT: 5044
     networks: 
       - main-network
+      - elk
       
   movie-inventory-service:
     container_name: movie-inventory-service
@@ -61,10 +62,11 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
       TOKEN_URL: http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/token
       SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI:  http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/check_token
-      LOGSTASH_HOST: http://kgzok12814dns.eastus2.cloudapp.azure.com:9600
-      LOGSTASH_PORT: 9600
+      LOGSTASH_HOST: logstash
+      LOGSTASH_PORT: 5044
     networks: 
-      - main-network                      
+      - main-network  
+      - elk                    
     
   # movie-booking-service:
   #   container_name: movie-booking-service
@@ -109,31 +111,31 @@ services:
       SPRING_DATA_ELASTICSEARCH_CLUSTER-NODES: elasticsearch:9300
       SPRING_DATA_ELASTICSEARCH_CLUSTER-NAME: elasticsearch
       SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI:  http://kgzok12814dns.eastus2.cloudapp.azure.com:8091/oauth/check_token
-      LOGSTASH_HOST: http://logstash:9600
-      LOGSTASH_PORT: 9600
+      LOGSTASH_HOST: logstash
+      LOGSTASH_PORT: 5044
     restart: always
     networks:
       main-network:
       elk:
       
 
-  kafka-service:
-    container_name: kafka-service
-    build: ./kafka-publish-server/kafka-publish-server
-    image: kafka-service
-    ports:
-      - "8055:8055"
-    depends_on: 
-      - eureka
-      - kafka
-      - logstash
-    environment: 
-      KAFKA_BOOTSTRAPADDRESS: kafka:9092
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
-      LOGSTASH_HOST: http://logstash:9600
-      LOGSTASH_PORT: 9600
-    networks: 
-      - main-network    
+  #kafka-service:
+   # container_name: kafka-service
+   # build: ./kafka-publish-server/kafka-publish-server
+    #image: kafka-service
+    #ports:
+     # - "8055:8055"
+    #depends_on: 
+     # - eureka
+      #- kafka
+      #- logstash
+    #environment: 
+     # KAFKA_BOOTSTRAPADDRESS: kafka:9092
+      #EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      #LOGSTASH_HOST: http://logstash:9600
+      #LOGSTASH_PORT: 9600
+    #networks: 
+     # - main-network    
 
   mysql-container:
     image: mysql:latest
@@ -148,32 +150,32 @@ services:
     networks: 
       - main-network
   
-  zookeeper:
-    image: 'docker.io/bitnami/zookeeper:latest'
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    volumes: 
-      - "zookeeper_data:/bitnami"
-    environment: 
-      - ALLOW_ANONYMOUS_LOGIN=yes
-    networks: 
-      - main-network  
+  #zookeeper:
+   # image: 'docker.io/bitnami/zookeeper:latest'
+    #container_name: zookeeper
+    #ports:
+     # - "2181:2181"
+    #volumes: 
+     # - "zookeeper_data:/bitnami"
+    #environment: 
+     # - ALLOW_ANONYMOUS_LOGIN=yes
+    #networks: 
+     # - main-network  
 
-  kafka:
-    image: 'docker.io/bitnami/kafka:latest'
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    volumes: 
-      - "kafka_data:/bitnami"
-    environment: 
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes    
-    depends_on: 
-      - zookeeper
-    networks: 
-      - main-network 
+  #kafka:
+   # image: 'docker.io/bitnami/kafka:latest'
+    #container_name: kafka
+    #ports:
+     # - "9092:9092"
+    #volumes: 
+     # - "kafka_data:/bitnami"
+    #environment: 
+     # - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      #- ALLOW_PLAINTEXT_LISTENER=yes    
+    #depends_on: 
+     # - zookeeper
+    #networks: 
+     # - main-network 
   
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.1
@@ -194,12 +196,11 @@ services:
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.2.1
     container_name: logstash
-    command: logstash -f /logstash/pipeline/logstash.conf
     ports:
-      - "9600:9600"
+      - "5044:5044"
     restart: unless-stopped
     volumes:
-      - ./etc/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     depends_on:
       - elasticsearch
     networks:
