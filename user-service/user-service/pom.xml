@@ -145,8 +145,8 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>com/movieapp/userservice/dto/*</exclude>
-								<exclude>com/movieapp/userservice/entity/*</exclude>
+								<exclude>com/example/userservice/exception/*</exclude>
+								<exclude>com/example/userservice/entity/*</exclude>
 							</excludes>
 							<dataFile>target/jacoco.exec</dataFile>
 							<outputDirectory> target/jacoco-ut</outputDirectory>
