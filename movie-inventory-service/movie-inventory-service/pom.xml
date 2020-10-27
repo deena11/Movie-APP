@@ -144,8 +144,7 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>com/movieapp/inventoryservice/dto/*</exclude>
-								<exclude>com/movieapp/inventoryservice/entity/*</exclude>
+								<exclude>com/example/movieinventoryservice/entity/*</exclude>
 							</excludes>
 							<dataFile>target/jacoco.exec</dataFile>
 							<outputDirectory> target/jacoco-ut</outputDirectory>
